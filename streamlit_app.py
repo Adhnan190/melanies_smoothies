@@ -27,13 +27,18 @@ ingredients_list=st.multiselect(
  
 if ingredients_list:
     ingredients_string = ''
-    for x in ingredients_list:
-        ingredients_string +=x + ' '
-        search_on=pd_df.loc[pd_df['FRUIT_NAME'] == x, 'SEARCH_ON'].iloc[0]
-        # st.write('The search value for ', x,' is ', search_on, '.')
-        st.subheader(x+ ' Nutrition Information')
-        smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/"+search_on)
-        sf_df = st.dataframe(data=smoothiefroot_response.json(), use_container_width=True)
+
+    for fruit_chosen in ingredients_list:
+        ingredients_string += fruit_chosen + ' '
+
+        search_on = pd_df.loc[pd_df['FRUIT_NAME'] == fruit_chosen, 'SEARCH_ON'].iloc[0]
+
+        st.subheader(fruit_chosen + ' Nutrition Information')
+        fruityvice_response = requests.get("https://fruityvice.com/api/fruit/" + search_on)
+        fv_df = st.dataframe(data=fruityvice_response.json(), use_container_width=True)
+
+    # st.write(ingredients_string)
+
     # st.write(ingredients_string)
     my_insert_stmt = """insert into smoothies.public.orders(ingredients, name_on_order)
     values ('""" + ingredients_string + """','""" + name_on_order + """')"""
