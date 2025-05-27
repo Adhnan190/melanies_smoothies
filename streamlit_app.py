@@ -26,7 +26,7 @@ ingredients_list = st.multiselect(
 
 if ingredients_list:
     ingredients_string = ''
-        for x in ingredients_list:
+    for x in ingredients_list:
         ingredients_string += x + ' '
         search_on = str(pd_df.loc[pd_df['FRUIT_NAME'] == x, 'SEARCH_ON'].iloc[0])
         st.subheader(x + ' Nutrition Information')
