@@ -2,6 +2,7 @@
 import streamlit as st
 from snowflake.snowpark.functions import col
 import requests
+ 
 # Write directly to the app
 st.title(f":cup_with_straw: Customize Your Smoothie! :cup_with_straw:")
 st.write(
@@ -10,16 +11,16 @@ st.write(
  
 name_on_order = st.text_input('Name on smoothie: ')
 st.write('The name on your Smoothie will be:', name_on_order)
- 
 cnx = st.connection("snowflake")
 session = cnx.session()
-my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'),col('SEARCH_ON'))
+my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'))
 # st.dataframe(data=my_dataframe, use_container_width=True)
+
 pd_df = my_dataframe.to_pandas()
 # st.dataframe(pd_df)
 # st.stop()
  
-ingredients_list=st.multiselect(
+ingredients_list = st.multiselect(
     'Choose upto 5 ingredients:',
     my_dataframe,
     max_selections=5
@@ -28,12 +29,13 @@ ingredients_list=st.multiselect(
 if ingredients_list:
     ingredients_string = ''
     for x in ingredients_list:
-        ingredients_string +=x + ' '
-        search_on=pd_df.loc[pd_df['FRUIT_NAME'] == x, 'SEARCH_ON'].iloc[0]
-        # st.write('The search value for ', x,' is ', search_on, '.')
+        ingredients_string += x + ' '
+        search_on=pd_df.loc[pd_df['FRUIT_NAME'] == fruit_chosen, 'SEARCH_ON'].iloc[0]
+        st.write('The search value for ', fruit_chosen,' is ', search_on, '.')
         st.subheader(x+ ' Nutrition Information')
-        smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/"+search_on)
+        smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/watermelon")
         sf_df = st.dataframe(data=smoothiefroot_response.json(), use_container_width=True)
+
     # st.write(ingredients_string)
     my_insert_stmt = """insert into smoothies.public.orders(ingredients, name_on_order)
     values ('""" + ingredients_string + """','""" + name_on_order + """')"""
@@ -41,5 +43,8 @@ if ingredients_list:
     if time_to_insert:
         session.sql(my_insert_stmt).collect()
         st.success('Your Smoothies is ordered!', icon="✅")
- 
- 
+
+NameError: This app has encountered an error. The original error message is redacted to prevent data leaks. Full error details have been recorded in the logs (if you're on Streamlit Cloud, click on 'Manage app' in the lower right of your app).
+Traceback:
+File "/mount/src/melanies_smoothies/streamlit_app.py", line 19, in <module>
+    pd_df = my_dataframe.to_pandas()
